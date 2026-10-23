@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+redis
+python-multipart
+pillow
+scikit-learn
+numpy
+pandas
+matplotlib
+reportlab
+openpyxl
+psutil

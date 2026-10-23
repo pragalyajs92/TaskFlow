@@ -1,0 +1,42 @@
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+
+# Virtual environments
+venv/
+.venv/
+backend/venv/
+worker/venv/
+
+# Node.js
+node_modules/
+dist/
+.next/
+coverage/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# IDE
+.vscode/
+
+# Generated output
+output/*
+!output/.gitkeep
+
+# Local databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
