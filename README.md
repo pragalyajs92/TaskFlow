@@ -1,423 +1,382 @@
-TaskFlow --- Distributed Job Queue
+# TaskFlow — Distributed Job Queue System
 
-TaskFlow is a distributed background job processing system built to
-demonstrate how jobs can be submitted to a queue, distributed across
-multiple workers, processed asynchronously, and monitored through a live
-dashboard.
+TaskFlow is a distributed background job processing system built to demonstrate how jobs can be submitted to a queue, distributed across multiple workers, processed asynchronously, and monitored through a live dashboard.
 
-🚀 Overview
+## 🚀 Overview
 
-TaskFlow accepts different types of computational jobs through a FastAPI
-backend. Jobs are placed into a Redis queue and are picked up by
-independent worker processes.
+TaskFlow accepts different types of computational jobs through a **FastAPI backend**. Jobs are placed into a **Redis queue** and picked up by independent worker processes for asynchronous execution.
 
-                    ┌─────────────────────┐
-                    │   React Dashboard   │
-                    └──────────┬──────────┘
-                               │
-                               ▼
-                    ┌─────────────────────┐
-                    │    FastAPI API      │
-                    └──────────┬──────────┘
-                               │
-                               ▼
-                    ┌─────────────────────┐
-                    │    Redis Queue      │
-                    └──────────┬──────────┘
-                               │
-                 ┌─────────────┼─────────────┐
-                 ▼             ▼             ▼
-          ┌────────────┐ ┌────────────┐ ┌────────────┐
-          │  Worker 1  │ │  Worker 2  │ │  Worker 3  │
-          └─────┬──────┘ └─────┬──────┘ └─────┬──────┘
-                │              │              │
-                └──────────────┼──────────────┘
-                               ▼
-                         Output Files
+### System Architecture
 
-✨ Features
+```text
+                  ┌─────────────────────┐
+                  │   React Dashboard   │
+                  └──────────┬──────────┘
+                             │
+                             ▼
+                  ┌─────────────────────┐
+                  │     FastAPI API     │
+                  └──────────┬──────────┘
+                             │
+                             ▼
+                  ┌─────────────────────┐
+                  │    Redis Queue      │
+                  └──────────┬──────────┘
+                             │
+               ┌─────────────┼─────────────┐
+               ▼             ▼             ▼
+         ┌───────────┐ ┌───────────┐ ┌───────────┐
+         │ Worker 1  │ │ Worker 2  │ │ Worker 3  │
+         └─────┬─────┘ └─────┬─────┘ └─────┬─────┘
+               │             │             │
+               └─────────────┼─────────────┘
+                             ▼
+                       Output Files
+```
 
-Distributed Job Queue
+## ✨ Features
 
-Jobs are submitted to a Redis-backed queue.
+### 1. Distributed Job Queue
 
-Multiple worker processes can consume jobs independently.
+- Jobs are submitted to a Redis-backed queue.
+- Multiple independent worker processes consume jobs.
+- Workers can execute jobs concurrently and distribute the workload.
+- Job status and worker metrics are tracked through Redis.
 
-Workers can run simultaneously and distribute the workload.
+### 2. Supported Job Types
 
-Supported Jobs
+#### 🖼️ Image Resizing
 
-1. Image Resize
+Upload an image and process it asynchronously through a background worker.
 
-Upload an image and TaskFlow processes it through a background worker.
+- **Input:** Image file
+- **Processing:** Image resizing using Pillow
+- **Output:** Resized image saved in the output directory
 
-Input - Image file
+#### 🏠 House Price Prediction
 
-Output - Resized image saved in the output directory
+Run a machine-learning prediction using a trained Linear Regression model.
 
-2. House Price Prediction
+- **Input:** Area, number of bedrooms, and number of bathrooms
+- **Processing:** Prediction using a scikit-learn model
+- **Output:** Predicted house price
 
-Runs a machine-learning prediction using a trained Linear Regression
-model.
+#### 📊 Sales Report Generation
 
-Input - Area - Number of bedrooms - Number of bathrooms
+Upload sales data in CSV or XLSX format to generate a PDF analysis report.
 
-Output - Predicted house price
+Reports can include:
 
-3. Report Generation
+- Sales statistics
+- Sales trends
+- Category analysis
+- Data visualizations and generated charts
 
-Accepts sales data in CSV/XLSX format and generates a PDF analysis
-report.
+### 3. Worker Monitoring
 
-The report can contain: - Sales statistics - Sales trends - Category
-analysis - Generated charts
+TaskFlow supports multiple worker processes, such as:
 
-👷 Workers
+- `worker-1`
+- `worker-2`
+- `worker-3`
 
-TaskFlow supports multiple worker processes.
+The dashboard displays worker information, including:
 
-Example:
+- Online or offline status
+- Idle or processing status
+- Current job
+- Job ID and job type
+- Processing progress
 
-worker-1
-worker-2
-worker-3
+### 4. Worker Performance Metrics
 
-Each worker maintains its own status in Redis.
+Each worker records runtime metrics, including:
 
-The dashboard displays: - Online / Offline status - Idle / Processing
-status - Current job - Job ID - Job type - Processing progress
+- Total jobs processed
+- Failed jobs
+- Success rate
+- Average processing time
 
-📊 Worker Metrics
+Example metrics are illustrative; actual values depend on workload and execution.
 
-Each worker records runtime metrics including:
+### 5. System Health Monitoring
 
-Jobs processed
+TaskFlow monitors the machine running the backend and displays:
 
-Jobs failed
+- CPU usage
+- CPU core count
+- Memory usage
+- Memory used and total memory
+- Disk usage
+- Disk used and total disk capacity
 
-Success rate
+**System health endpoint:**
 
-Average processing time
+`GET /system/health`
 
-Example:
-
-Jobs Processed     12
-Success Rate       100%
-Avg Processing     14.3s
-
-These values are maintained by the workers and displayed on the
-dashboard.
-
-🩺 System Health
-
-TaskFlow also monitors the machine running the backend.
-
-The dashboard displays live:
-
-CPU usage
-
-CPU core count
-
-Memory usage
-
-Memory used / total
-
-Disk usage
-
-Disk used / total
-
-Example:
-
-CPU       89%       8 cores
-Memory    92.9%     10.9 / 11.7 GB
-Disk      80.9%     184.5 / 228.2 GB
-
-The system-health endpoint is:
-
-GET /system/health
-
-🖥️ Dashboard
+### 6. Interactive Dashboard
 
 The React dashboard provides:
 
-Total job statistics
+- Total job statistics
+- Completed, processing, and failed job counts
+- Job creation cards
+- Run All Jobs functionality
+- Worker monitoring and metrics
+- Queue status
+- System health information
+- Job history
+- Output downloads
 
-Completed / processing / failed jobs
+## 🛠️ Technology Stack
 
-Job creation cards
+| Component | Technology |
+|---|---|
+| Frontend | React |
+| Backend | FastAPI |
+| Queue | Redis |
+| Containerization | Docker |
+| Workers | Python |
+| Machine Learning | scikit-learn |
+| Data Processing | Pandas |
+| Report Generation | Matplotlib, ReportLab |
+| Image Processing | Pillow |
+| System Monitoring | psutil |
+| API Server | Uvicorn |
 
-Run All Jobs
+## 📁 Project Structure
 
-Worker monitoring
-
-Worker metrics
-
-Queue status
-
-System health
-
-Job history
-
-Output downloads
-
-🛠️ Technology Stack
-
-Component           Technology
-
-Frontend            React
-Backend             FastAPI
-Queue               Redis
-Containerization    Docker
-Workers             Python
-ML                  Scikit-learn
-Data Processing     Pandas
-Report Generation   Matplotlib / ReportLab
-Image Processing    Pillow
-System Monitoring   psutil
-API Server          Uvicorn
-
-📁 Project Structure
-
+```text
 TaskFlow/
-│
 ├── backend/
 │   ├── main.py
-│   └── venv/
-│
+│   └── requirements.txt
 ├── dashboard/
+│   ├── public/
 │   └── src/
 │       ├── App.jsx
 │       ├── App.css
 │       ├── index.css
 │       └── main.jsx
-│
-├── input/
-│   ├── images
-│   └── sales datasets
-│
+├── input/                    # Local input files and datasets
 ├── ml/
 │   └── house_price_model.py
-│
-├── output/
-│   ├── resized images
-│   ├── generated reports
-│   └── generated charts
-│
+├── output/                   # Generated files
 ├── reports/
 │   └── report_generator.py
-│
-└── worker/
-    └── worker.py
+├── worker/
+│   └── worker.py
+├── .gitignore
+└── README.md
+```
 
-⚙️ How It Works
+> Note: Local input files, generated outputs, virtual environments, and sensitive configuration files may be excluded from the GitHub repository.
 
-1. Submit a Job
+## ⚙️ How It Works
 
-The dashboard sends a job request to FastAPI.
+### Job Processing Workflow
 
-2. Add Job to Redis
+1. **Submit a job:** The dashboard sends a request to the FastAPI backend.
+2. **Queue the job:** FastAPI places the job in the Redis `task_queue`.
+3. **Assign a worker:** An available worker retrieves a queued job.
+4. **Process the job:** The worker performs the requested operation.
+5. **Generate the output:** The processed file, prediction, or report is produced as applicable.
+6. **Update job status:** The worker updates the job state and worker metrics in Redis.
+7. **Refresh the dashboard:** The dashboard periodically retrieves updated job and worker information.
 
-FastAPI places the job into the Redis task_queue.
+### Processing Pipelines
 
-3. Worker Picks Up the Job
+**Image resizing**
 
-An available worker listens to the queue and retrieves the next job.
+```text
+Image Upload → Redis Queue → Worker → Pillow → Resized Image
+```
 
-4. Process the Job
+**House price prediction**
 
-The worker performs the required operation.
+```text
+Prediction Request → Redis Queue → Worker
+                   → scikit-learn Model → Predicted Price
+```
 
-Image Resize
-     ↓
-Pillow
-     ↓
-Resized Image
+**Sales report generation**
 
-House Price
-     ↓
-Scikit-learn Model
-     ↓
-Prediction
-
-Sales Dataset
-     ↓
-Pandas
-     ↓
-Analysis + Charts
-     ↓
-PDF Report
-
-5. Update Job Status
-
-The worker updates the job state and its own worker metrics in Redis.
+```text
+CSV/XLSX Dataset → Redis Queue → Worker
+                 → Pandas Analysis
+                 → Charts and Visualizations
+                 → PDF Report
+```
 
 Possible job states include:
 
-Queued
-Processing
-Completed
-Failed
+`Queued` → `Processing` → `Completed` or `Failed`
 
-6. Dashboard Updates
+## 🐳 Redis Setup with Docker
 
-The dashboard periodically retrieves the latest job and worker
-information and displays it in real time.
-
-🐳 Redis with Docker
-
-TaskFlow uses Redis as the distributed job queue.
+TaskFlow uses Redis as its distributed job queue.
 
 Start the existing Redis container:
 
+```powershell
 docker start taskflow-redis
+```
 
-Check Redis:
+Verify that Redis is running:
 
+```powershell
 docker exec taskflow-redis redis-cli ping
+```
 
-Expected:
+Expected output:
 
+```text
 PONG
+```
 
-▶️ Running the Project
+## ▶️ Running the Project Locally
 
-1. Start Redis
+### Prerequisites
 
+Install or configure the following:
+
+- Python
+- Node.js and npm
+- Docker Desktop
+- Redis running in Docker
+
+### 1. Start Redis
+
+```powershell
 docker start taskflow-redis
+```
 
-2. Start the Backend
+If the container does not exist, create a Redis container before proceeding.
 
-Open a terminal:
+### 2. Start the FastAPI Backend
 
+Open a PowerShell terminal:
+
+```powershell
 cd C:\Users\praga\TaskFlow\backend
 .\venv\Scripts\Activate.ps1
 uvicorn main:app --reload
+```
 
-Backend:
+Backend URL:
 
-http://127.0.0.1:8000
+`http://127.0.0.1:8000`
 
-3. Start Worker 1
+API documentation:
 
-Open another terminal:
+`http://127.0.0.1:8000/docs`
 
+### 3. Start Worker 1
+
+Open a new PowerShell terminal:
+
+```powershell
 cd C:\Users\praga\TaskFlow\worker
 ..\backend\venv\Scripts\Activate.ps1
-$env:WORKER_ID="worker-1"
+$env:WORKER_ID = "worker-1"
 python worker.py
+```
 
-4. Start Worker 2
+### 4. Start Worker 2
 
-Open another terminal:
+Open another PowerShell terminal:
 
+```powershell
 cd C:\Users\praga\TaskFlow\worker
 ..\backend\venv\Scripts\Activate.ps1
-$env:WORKER_ID="worker-2"
+$env:WORKER_ID = "worker-2"
 python worker.py
+```
 
-5. Start Worker 3
+### 5. Start Worker 3
 
-Open another terminal:
+Open another PowerShell terminal:
 
+```powershell
 cd C:\Users\praga\TaskFlow\worker
 ..\backend\venv\Scripts\Activate.ps1
-$env:WORKER_ID="worker-3"
+$env:WORKER_ID = "worker-3"
 python worker.py
+```
 
-6. Start the Dashboard
+### 6. Start the React Dashboard
 
-Open another terminal:
+Open another PowerShell terminal:
 
+```powershell
 cd C:\Users\praga\TaskFlow\dashboard
+npm install
 npm run dev
+```
 
-Open:
+Open the dashboard:
 
-http://localhost:5173/
+`http://localhost:5173/`
 
-🔄 Job Lifecycle
+> These commands assume your local virtual environment, Redis container, dependencies, and project configuration are already set up. On a new machine, install the dependencies and configure the environment first.
 
+## 🔄 Job Lifecycle
+
+```text
 Create Job
     ↓
-FastAPI
+FastAPI Backend
     ↓
 Redis Queue
     ↓
-Worker receives job
+Worker Receives Job
     ↓
-Processing
+Job Processing
     ↓
-Output generated
+Output Generated
     ↓
-Job completed
+Job Status Updated
     ↓
-Worker metrics updated
+Worker Metrics Updated
     ↓
-Dashboard refreshed
+Dashboard Refreshed
+```
 
-🎯 Why TaskFlow?
+## 🎯 Why TaskFlow?
 
-TaskFlow demonstrates practical distributed-systems concepts rather than
-being only a CRUD application.
+TaskFlow demonstrates practical distributed-systems concepts beyond a traditional CRUD application.
 
-It demonstrates:
+Key concepts demonstrated include:
 
-Asynchronous processing
+- Asynchronous job processing
+- Message queues
+- Independent worker processes
+- Concurrent job execution
+- Redis integration
+- Docker-based infrastructure
+- REST API development
+- Machine-learning integration
+- File processing and report generation
+- Worker performance metrics
+- System resource monitoring
 
-Message queues
+## 🔮 Future Improvements
 
-Worker processes
+Potential enhancements include:
 
-Parallel job execution
+- Worker auto-scaling
+- Job priorities
+- Automatic retry policies
+- Scheduled jobs
+- Dead-letter queues
+- Persistent job storage
+- Authentication and authorization
+- Rate limiting
+- Job cancellation
+- Workers distributed across multiple machines
+- Prometheus and Grafana monitoring
+- Kubernetes deployment
 
-Redis
+## 📌 Project Goal
 
-Docker
-
-REST APIs
-
-Background processing
-
-Machine-learning integration
-
-File processing
-
-Runtime monitoring
-
-Worker health and metrics
-
-Resource monitoring
-
-🔮 Possible Future Improvements
-
-Potential extensions include:
-
-Worker auto-scaling
-
-Job priorities
-
-Retry policies
-
-Scheduled jobs
-
-Dead-letter queues
-
-Persistent job storage
-
-Authentication
-
-Rate limiting
-
-Job cancellation
-
-Distributed worker deployment across multiple machines
-
-Prometheus/Grafana monitoring
-
-Kubernetes deployment
-
-📌 Project Goal
-
-TaskFlow was built to understand and demonstrate how distributed
-background-job systems work internally, including how an API, queue,
-workers, outputs, and monitoring layer work together as one system.
+TaskFlow was built to understand and demonstrate how distributed background-job systems work internally, including how an API, queue, workers, outputs, and monitoring layer operate together as one system.
